@@ -61,6 +61,7 @@ namespace Automation_Framework
         public void Test1()
         {
             Logger.Error("AAA");
+            Logger.Info("BBB");
             Assert.Pass();
         }
     }

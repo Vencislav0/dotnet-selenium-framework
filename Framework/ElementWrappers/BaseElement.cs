@@ -1,5 +1,6 @@
 ﻿using Automation_Framework.Framework.Constants;
 using Automation_Framework.Framework.Logging;
+using Automation_Framework.Framework.Utilities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
@@ -18,6 +19,7 @@ public class BaseElement
     protected string name;
     protected IWebDriver driver;
     protected WebDriverWait wait;
+    protected CustomWaits customWaits;
     protected Actions actions;
     protected TimeSpan timeout = Timeouts.DEFAULT_WAIT;
     public BaseElement(IWebDriver driver, By locator, string name) 
@@ -27,6 +29,7 @@ public class BaseElement
         this.driver = driver;
         this.actions = new Actions(driver);
         this.wait = new WebDriverWait(driver, timeout);
+        this.customWaits = new CustomWaits(locator, driver, timeout);
     }
 
     public IWebElement GetElement()
@@ -34,20 +37,14 @@ public class BaseElement
        var element = wait.Until(dr => dr.FindElement(locator));
         return element;
     }
-
-    public ICollection<IWebElement> GetElements()
-    {
-        var elements = wait.Until(dr => dr.FindElements(locator));
-        return elements;
-    }
-
+   
     public void Click()
     {
         try
         {
             Logger.Debug($"Clicking on: {name}");
-            WaitUntilVisible();
-            WaitUntilEnabled();
+            customWaits.WaitUntilVisible();
+            customWaits.WaitUntilEnabled();
             GetElement().Click();
 
         }
@@ -88,7 +85,7 @@ public class BaseElement
             return isDisplayed;
 
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             Logger.Warn($"Element {name} was not displayed");
             return false;
@@ -100,7 +97,7 @@ public class BaseElement
         try
         {
             Logger.Debug($"Hovering on: {name}");
-            WaitUntilVisible();
+            customWaits.WaitUntilVisible();
             actions.MoveToElement(GetElement()).Perform();
 
         }
@@ -118,7 +115,7 @@ public class BaseElement
         try
         {
             Logger.Debug($"Scrolling to element: {name}");
-            WaitUntilVisible();
+            customWaits.WaitUntilVisible();
             actions.ScrollToElement(GetElement()).Perform();
 
         }
@@ -135,7 +132,7 @@ public class BaseElement
         try
         {
             Logger.Debug($"Checking if {name} is enabled.");
-            WaitUntilEnabled();
+            customWaits.WaitUntilEnabled();
             return true;
 
         }
@@ -151,8 +148,8 @@ public class BaseElement
         try
         {
             Logger.Debug($"Getting {attributeName} attribute from: {name}");
-            WaitUntilVisible();
-            WaitUntilEnabled();
+            customWaits.WaitUntilVisible();
+            customWaits.WaitUntilEnabled();
             return GetElement().GetAttribute(attributeName);
 
         }
@@ -170,8 +167,8 @@ public class BaseElement
         try
         {
             Logger.Debug($"Getting CSS value {propertyName} from: {name}");
-            WaitUntilVisible();
-            WaitUntilEnabled();
+            customWaits.WaitUntilVisible();
+            customWaits.WaitUntilEnabled();
             return GetElement().GetCssValue(propertyName);
 
         }
@@ -183,40 +180,5 @@ public class BaseElement
         }
 
     }
-
-    protected void WaitUntilVisible()
-    {
-        wait.Until(driver =>
-        {
-            var element = driver.FindElement(locator);
-            return element.Displayed;
-
-        });
-    }
-
-    protected void WaitUntilHidden()
-    {
-        wait.Until(driver =>
-        {
-            try
-            {
-                var element = driver.FindElement(locator);
-                return !element.Displayed;
-            }
-            catch (NoSuchElementException)
-            {
-                return true;
-            }
-
-        });
-    }
-
-    protected void WaitUntilEnabled()
-    {
-        wait.Until(driver =>
-        {
-            var element = driver.FindElement(locator);
-            return element.Enabled;
-        });
-    }
+    
 }
