@@ -57,12 +57,6 @@ namespace Automation_Framework
             LogManager.Shutdown();
         }
 
-        [Test]
-        public void Test1()
-        {
-            Logger.Error("AAA");
-            Logger.Info("BBB");
-            Assert.Pass();
-        }
+       
     }
 }

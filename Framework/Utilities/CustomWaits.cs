@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using Automation_Framework.Framework.Logging;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
@@ -30,6 +31,31 @@ namespace Automation_Framework.Framework.Utilities
                 var element = driver.FindElement(locator);
                 return element.Displayed;
 
+            });
+        }
+
+        public ICollection<IWebElement> WaitUntilAllVisibleAndReturn()
+        {
+            var elements = wait.Until(driver =>
+            {
+                var elements = driver.FindElements(locator);
+                Logger.Debug($"Found {elements.Count} elements... checking visibility");
+                return elements.All(e => e.Displayed) ? elements : null;
+            });
+
+            return elements.ToList();
+        }
+
+        public void WaitUntilVisibleAt(int index)
+        {
+            wait.Until(driver =>
+            {
+                var elements = driver.FindElements(locator);
+                if (index < 0 || index >= elements.Count)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index), "Index is out of range.");
+                }
+                return elements[index].Displayed;
             });
         }
 

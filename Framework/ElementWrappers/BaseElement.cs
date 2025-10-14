@@ -61,6 +61,7 @@ public class BaseElement
         try
         {
             Logger.Debug($"Getting text from: {name}");
+            customWaits.WaitUntilVisible();
             string text = GetElement().Text;
             Logger.Debug($"Text: {text}");
             return text;

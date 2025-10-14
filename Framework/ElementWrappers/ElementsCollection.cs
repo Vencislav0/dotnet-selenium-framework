@@ -32,8 +32,9 @@ namespace Automation_Framework.Framework.ElementWrappers
 
         public ICollection<IWebElement> GetElements()
         {
-            var elements = wait.Until(dr => dr.FindElements(locator));
-            return elements.ToList();
+            
+            var elements = customWaits.WaitUntilAllVisibleAndReturn();
+            return elements;
         }
 
 
@@ -58,8 +59,7 @@ namespace Automation_Framework.Framework.ElementWrappers
         }
 
         public IWebElement GetElementAt(int index)
-        {
-            
+        {         
             var element = GetElements().Select((element, i) => i == index ? element : null)
                     .FirstOrDefault();
 
